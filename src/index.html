@@ -1,0 +1,44 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <script src="example1.js"></script>
+</head>
+<body>
+  <style>
+    .webcam {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .predict-something {
+      text-align: center;
+    }
+    #predict {
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 200px;
+      font-size: 27px;
+    }
+    #predict:hover {
+      background-color: #0ff;
+      color: #fff;
+    }
+    .predict-display {
+      text-align: center;
+      font-size: 30px;
+    }
+  </style>
+  <div class="webcam">
+    <video autoplay playsinline muted id="webcam" width="224" height="224"></video>
+  </div>
+  <div class="predict-something">
+    <button id="predict">
+      <span>今写っている何かをモデルに食わす.</span>
+    </button>
+  </div>
+
+  <div class="predict-display">
+    <p>お前は: <span id="display">xxx</span> :に似ている.</p>
+  </div>
+</body>
+</html>
