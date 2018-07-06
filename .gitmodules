@@ -1,0 +1,3 @@
+[submodule "OreimoDetection"]
+	path = OreimoDetection
+	url = https://github.com/Intel0tw5727/OreimoDetection
