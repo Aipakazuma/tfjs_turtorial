@@ -1,7 +1,7 @@
 // JavaScript
 
 import * as tf from '@tensorflow/tfjs';
-import {Webcam} from './webcam';
+// import {Webcam} from './webcam';
 
 let mobilenet;
 let isPredicting = false;
@@ -18,8 +18,9 @@ function label_to_text(classId) {
 }
 
 function _reshape(img) {
+  console.log(img);
   const img2 = tf.image.resizeBilinear(img, [28,28]);
-  return img2.reshape([1, 1, 28, 28]);
+  return tf.cast(img2.reshape([1, 1, 28, 28]), 'float32');
 }
 
 function createBarGraph(dataSet) {
@@ -93,10 +94,76 @@ function createBarGraph(dataSet) {
   .call(d3.axisLeft(y)); //左に軸が出るように設定
 }
 
+function post() {
+  var url = document.getElementById('image-url').value;
+  if (url == '') return;
+
+  var requestJson = JSON.stringify({'url': url});
+  var xhr = new XMLHttpRequest();
+  var url = 'https://localhost:8000/get_image';
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+          var json = JSON.parse(xhr.responseText);
+          console.log(json);
+
+          var img = json['img'];
+          var imgElement = document.getElementById('get-image');
+          imgElement.setAttribute('src', 'data:image/png;base64,' + img);
+      }
+  };
+  xhr.send(requestJson);
+}
+
+function base64ToImage(base64img) {
+  var img = new Image();
+  img.onload = function() {
+    return img;
+  };
+  img.src = base64img;
+  return img;
+}
+
+function createImageData(img) {
+  var cv = document.createElement('canvas');
+  cv.width = img.naturalWidth;
+  cv.height = img.naturalHeight;
+
+  var ct = cv.getContext('2d');
+  ct.drawImage(img, 0, 0);
+
+  var data = ct.getImageData(0, 0, cv.width, cv.height);
+  return data;
+}
+
+function grayScale(img) {
+  var cv = document.createElement('canvas');
+  var ct = cv.getContext('2d');
+  var dst = ct.createImageData(img.width, img.height);
+  for (var i = 0; i < img.data.length; i=i+4) {
+    var pixel = (img.data[i] + img.data[i+1] + img.data[i+2]) / 3;
+    dst.data[i] = dst.data[i+1] = dst.data[i+2] = pixel;
+    dst.data[i+3] = img.data[i+3];
+  }
+
+  return dst;
+}
 
 document.addEventListener("DOMContentLoaded", function() {
-  const webcam = new Webcam(document.getElementById('webcam'));
+  // const webcam = new Webcam(document.getElementById('webcam'));
   const display = document.getElementById('display');
+
+  document.getElementById('submit-button').addEventListener('click', () => {
+    console.log('submit');
+    post();
+  });
+
+  document.getElementById('get-image').addEventListener('chnage', () => {
+    console.log('img change!');
+    isPredicting = true;
+    predict();
+  });
 
   document.getElementById('predict').addEventListener('click', () => {
     console.log('click!');
@@ -108,13 +175,13 @@ document.addEventListener("DOMContentLoaded", function() {
     tf.loadModel('https://localhost:8000/mobilenet/model.json')
       .then(model => {
       const m = tf.model({inputs: model.inputs, outputs: model.outputs});
-      const img = webcam.capture();
-      const img2 = _reshape(img);
+      // // const img = webcam.capture();
+      // const img2 = _reshape(img);
 
-      // test
-      const predicts = m.predict(img2);
-      console.log(predicts.dataSync());
-      console.log(predicts.argMax().dataSync()[0]);
+      // // test
+      // const predicts = m.predict(img2);
+      // console.log(predicts.dataSync());
+      // console.log(predicts.argMax().dataSync()[0]);
 
       // よくわからんが、returnで帰ってこないので
       // こうする
@@ -128,7 +195,15 @@ document.addEventListener("DOMContentLoaded", function() {
       isPredicting = false;
       const predictedClass = tf.tidy(() => {
         // Capture the frame from the webcam.
-        const img = webcam.capture();
+        // const img = webcam.capture();
+        var imgElement = document.getElementById('get-image');
+        // base64 -> img
+        var ___img = base64ToImage(imgElement.src);
+        // img -> canvas
+        var __img = createImageData(___img);
+        // canvas -> grayscale
+        // canvas -> tensor
+        var img = tf.fromPixels(__img, 1);
         const img2 = _reshape(img);
 
         const predictions = mobilenet.predict(img2);
@@ -147,7 +222,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   async function init() {
-    await webcam.setup();
+    // await webcam.setup();
     mobilenet = await loadModel();
   }
 

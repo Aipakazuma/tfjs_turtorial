@@ -1,8 +1,12 @@
-from flask import Flask, render_template, request, Blueprint
+from flask import Flask, render_template, \
+    request as flask_request, Blueprint
 from flask_cors import CORS
 import ssl
 import requests
 import os
+import json
+import base64
+
 
 model_app = Blueprint('mobilenet',
     __name__,
@@ -26,24 +30,25 @@ def index():
 
 @app.route('/get_image', methods=['POST'])
 def get_image():
-    img = None
-    try:
-        img = download_image(url)
-    except Exception as e:
-        print(e)
+    req = json.loads(flask_request.data.decode('utf8'))
+    print(req, 'test')
+    url = req['url']
+    img = download_image(url)
 
-    return img
+    res = {}
+    res['img'] = base64.b64encode(img).decode('utf8')
+    return json.dumps(res)
 
 
-def download_image(url, timeout = 10):
+def download_image(url, timeout=10):
     response = requests.get(url, allow_redirects=False, timeout=timeout)
     if response.status_code != 200:
-        e = Exception("HTTP status: " + response.status_code)
+        e = Exception('HTTP status: ' + response.status_code)
         raise e
 
-    content_type = response.headers["content-type"]
+    content_type = response.headers['content-type']
     if 'image' not in content_type:
-        e = Exception("Content-Type: " + content_type)
+        e = Exception('Content-Type: ' + content_type)
         raise e
 
     return response.content

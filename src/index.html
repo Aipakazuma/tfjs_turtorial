@@ -13,8 +13,16 @@
     </div>
   </header>
   <div class="container flex">
-    <div class="webcam">
+    <!-- <div class="webcam">
       <video autoplay playsinline muted id="webcam" width="224" height="224"></video>
+    </div> -->
+    <div class="form-container">
+      <form class="form" onsubmit="return false;">
+        <label for="image-url">画像URL入力</label>
+        <input type="text" id="image-url">
+        <button type="submit" id="submit-button">画像取得</button>
+        <img id='get-image'>
+      </form>
     </div>
     <div class="predict-display">
       <p>お前は: <span id="display">xxx</span> :に似ている.</p>
