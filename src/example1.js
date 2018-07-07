@@ -16,16 +16,10 @@ function _reshape(img) {
   return img2.reshape([1, 1, 28, 28]);
 }
 
-function createBarGraph() {
-  var dataSet = []; //棒グラフの各項目の値
+function createBarGraph(dataSet) {
   var width = 300;
   var height = 200;
   var elementName = '#bar';
-
-  for (var i = 0; i < labels.length; i++)
-  {
-    dataSet.push(Math.random())
-  }
 
   //グラフの各値をいい感じのwidthにするための変換関数
   var x = d3.scaleLinear() //配列の中身が数字 かつ 線形なグラフのとき
@@ -50,7 +44,7 @@ function createBarGraph() {
     .append('rect'); //確保した要素にrectとして追加する
 
   //棒グラフの「棒」の部分の描画
-  d3.select(elementName).selectAll('rect') //svg要素の中のrect要素をすべて選択（さっき作ったもの）
+  d3.select(elementName).selectAll('rect')
     .attr("class", "bar") //棒グラフであることを明示（必須ではない）
     .attr("x", function(d){
       return x(0);
@@ -64,9 +58,15 @@ function createBarGraph() {
     //iはdataSetの何番目の要素を参照しているかが入る
     .attr("height", 15)
     //各棒の縦の長さ（今回は棒の幅）
+    // .attr("width", function(d){
+    //   return x(d);
+    // })
+    // .attr("width", 0) //this is the initial value
+    .transition()
+    .duration(500) //time in ms
     .attr("width", function(d){
-      return x(d);
-    })
+        return x(d);
+    })//now, the final value
     //各棒の横の長さ（今回は棒の長さ）
     //dはdataSetの値そのものが入る。x関数を噛ませて長さを指定。
     .attr("fill", "#6fbadd");
@@ -129,13 +129,13 @@ document.addEventListener("DOMContentLoaded", function() {
         const predictions = mobilenet.predict(img2);
 
         const classId = predictions.argMax().dataSync();
+        createBarGraph(predictions.dataSync());
         return predictions.argMax();
       });
 
       const classId = (await predictedClass.data());
       const label = label_to_text(classId[0])
       document.getElementById('display').innerText = label;
-      createBarGraph();
       return classId;
     }
 
