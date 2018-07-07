@@ -5,20 +5,21 @@ import * as tf from '@tensorflow/tfjs';
 
 let mobilenet;
 let isPredicting = false;
-const labels = ['高坂桐乃',
+const labels = [
+  '高坂桐乃',
   '高坂京介',
   '黒猫',
   '新垣あやせ',
   '田村麻奈実',
   '来栖加奈子',
   '沙織・バジーナ'];
+const charaImgs = [];
 
 function label_to_text(classId) {
   return labels[classId];
 }
 
 function _reshape(img) {
-  console.log(img);
   const img2 = tf.image.resizeBilinear(img, [28,28]);
   return tf.cast(img2.reshape([1, 1, 28, 28]), 'float32');
 }
@@ -150,6 +151,12 @@ function grayScale(img) {
   return dst;
 }
 
+function insertCharaImage(classId) {
+  var element = charaImgs[classId];
+  var insertElement = document.getElementById('display-tai-img')
+  insertElement.src = element.src;
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   // const webcam = new Webcam(document.getElementById('webcam'));
   const display = document.getElementById('display');
@@ -159,11 +166,11 @@ document.addEventListener("DOMContentLoaded", function() {
     post();
   });
 
-  document.getElementById('get-image').addEventListener('chnage', () => {
+  document.getElementById('get-image').addEventListener('load', () => {
     console.log('img change!');
     isPredicting = true;
     predict();
-  });
+  }, false);
 
   document.getElementById('predict').addEventListener('click', () => {
     console.log('click!');
@@ -186,6 +193,7 @@ document.addEventListener("DOMContentLoaded", function() {
       // よくわからんが、returnで帰ってこないので
       // こうする
       mobilenet = m;
+      console.log(m);
       return m;
     });
   }
@@ -210,6 +218,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
         const classId = predictions.argMax().dataSync();
         createBarGraph(predictions.dataSync());
+        insertCharaImage(classId);
         return predictions.argMax();
       });
 
@@ -223,6 +232,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
   async function init() {
     // await webcam.setup();
+    for (var i = 0; i <= labels.length; i++) {
+      var element = document.getElementById('chara-img-' + i);
+      charaImgs.push(element);
+    }
+
     mobilenet = await loadModel();
   }
 

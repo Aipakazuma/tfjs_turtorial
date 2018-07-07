@@ -14,19 +14,25 @@ header {
 .predict-something {
   text-align: center;
 }
-#predict {
-  border: 1px solid #ccc;
-  padding: 10px;
-  width: 200px;
-  font-size: 27px;
+.button {
+  position: relative;
+  display: inline-block;
+  font-weight: bold;
+  padding: 0.25em 0.5em;
+  text-decoration: none;
+  color: #00BCD4;
+  background: #ECECEC;
+  transition: .4s;
+  font-size: 24px;
 }
-#predict:active {
-  background-color: #0ff;
-  color: #fff;
+
+.button:active {
+  background: #00bcd4;
+  color: white;
 }
 .predict-display {
   text-align: center;
-  font-size: 30px;
+  font-size: 20px;
   max-width: 100%;
 }
 .container {
@@ -46,4 +52,18 @@ header {
 }
 .axis text {
   fill:black;
+}
+
+.hidden {
+  display: none;
+}
+
+.display-text-and-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.display-tai-img-section {
+  width: 50px;
 }

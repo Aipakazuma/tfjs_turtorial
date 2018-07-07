@@ -9,7 +9,7 @@
 <body>
   <header>
     <div class="container">
-      <h1><span class="number-5000-i" title="TensorflowJS">TensorflowJS</span></h1>
+      <h1><span class="number-5000-i" title="Tシャツがほしい！！！">Tシャツがほしい！！！</span></h1>
     </div>
   </header>
   <div class="container flex">
@@ -20,19 +20,33 @@
       <form class="form" onsubmit="return false;">
         <label for="image-url">画像URL入力</label>
         <input type="text" id="image-url">
-        <button type="submit" id="submit-button">画像取得</button>
+        <button type="submit" class="button" id="submit-button">画像取得</button>
         <img id='get-image'>
       </form>
     </div>
     <div class="predict-display">
-      <p>お前は: <span id="display">xxx</span> :に似ている.</p>
+      <div class="display-text-and-img">
+        <span>お前は: <span id="display">xxx</span> :に似ている.</span>
+        <span class="display-tai-img-section">
+          <img id="display-tai-img">
+        </span>
+      </div>
       <svg id="bar" width="500" height="300"></svg>
     </div>
   </div>
   <div class="predict-something">
-    <button id="predict">
-      <span>今写っている何かをモデルに食わす.</span>
+    <button id="predict" class="button">
+      <span>モデルに食わす</span>
     </button>
+  </div>
+  <div class="hidden">
+    <img src="./img/chara/0.jpg" id="chara-img-0">
+    <img src="./img/chara/1.jpg" id="chara-img-1">
+    <img src="./img/chara/2.jpg" id="chara-img-2">
+    <img src="./img/chara/3.jpg" id="chara-img-3">
+    <img src="./img/chara/4.jpg" id="chara-img-4">
+    <img src="./img/chara/5.jpg" id="chara-img-5">
+    <img src="./img/chara/6.jpg" id="chara-img-6">
   </div>
 </body>
 </html>
