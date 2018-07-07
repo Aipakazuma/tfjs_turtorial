@@ -5,7 +5,13 @@ import {Webcam} from './webcam';
 
 let mobilenet;
 let isPredicting = false;
-const labels = ['高坂桐乃', '高坂京介', '黒猫', '新垣あやせ', '田村麻奈実', '来栖加奈子', '沙織・バジーナ'];
+const labels = ['高坂桐乃',
+  '高坂京介',
+  '黒猫',
+  '新垣あやせ',
+  '田村麻奈実',
+  '来栖加奈子',
+  '沙織・バジーナ'];
 
 function label_to_text(classId) {
   return labels[classId];
@@ -99,7 +105,6 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   async function loadModel() {
-    // tf.loadModel('https://s3.us-east-2.amazonaws.com/tfjs-demo/mobilenet/model.json')
     tf.loadModel('https://localhost:8000/mobilenet/model.json')
       .then(model => {
       const m = tf.model({inputs: model.inputs, outputs: model.outputs});

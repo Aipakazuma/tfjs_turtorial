@@ -1,32 +1,56 @@
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from flask import Flask, render_template, request, Blueprint
+from flask_cors import CORS
 import ssl
+import requests
+import os
+
+model_app = Blueprint('mobilenet',
+    __name__,
+    static_url_path='/mobilenet',
+    static_folder='./mobilenet'
+)
 
 
-class HTTPRequestHandler(SimpleHTTPRequestHandler):
-    def end_headers(self):
-        self.send_header('Access-Control-Allow-Origin', '*')
-        SimpleHTTPRequestHandler.end_headers(self)
+app = Flask(__name__)
+app.register_blueprint(model_app)
+CORS(app)
+
+context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+context.load_cert_chain('server.crt', 'server.key')
 
 
-def run(host, port, ctx, handler):
-    server = HTTPServer((host, port), handler)
-    server.socket = ctx.wrap_socket(server.socket)
-    print('Server Starts - %s:%s' % (host, port))
+@app.route('/')
+def index():
+    return 'hello, world!!'
 
+
+@app.route('/get_image', methods=['POST'])
+def get_image():
+    img = None
     try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    server.server_close()
-    print('Server Stops - %s:%s' % (host, port))
+        img = download_image(url)
+    except Exception as e:
+        print(e)
+
+    return img
+
+
+def download_image(url, timeout = 10):
+    response = requests.get(url, allow_redirects=False, timeout=timeout)
+    if response.status_code != 200:
+        e = Exception("HTTP status: " + response.status_code)
+        raise e
+
+    content_type = response.headers["content-type"]
+    if 'image' not in content_type:
+        e = Exception("Content-Type: " + content_type)
+        raise e
+
+    return response.content
+
 
 if __name__ == '__main__':
-    host = 'localhost'
-    port = 8000
-
-    ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    ctx.load_cert_chain('server.crt', keyfile='server.key')
-    ctx.options |= ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
-    handler = HTTPRequestHandler
-
-    run(host, port, ctx, handler)
+    app.run(host='0.0.0.0', port=8000,
+      ssl_context=context,
+      threaded=True,
+      debug=True)
